@@ -40,5 +40,17 @@ const csb = async (req, res) => {
     }
 }
 
-export { getProducts, getOrders, csb };
+//get user orders
+const getUserOrders = async (req, res) => {
+    try {
+        const { userId } = req.body;
+        const orders = await Orders.find({ userId }).sort({ createdAt: -1 });
+        res.status(200).json({ success: true, order: orders });
+    } catch (error) {
+        console.error('Error fetching user orders:', error);
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+}
+
+export { getProducts, getOrders, csb, getUserOrders };
 

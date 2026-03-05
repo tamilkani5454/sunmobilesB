@@ -40,10 +40,10 @@ export const verifyPayment = async (req, res) => {
 
   if (expectedSignature === razorpay_signature) {
     // ✅ payment success
-    res.json({ success: true })
+    res.json({ success: true, message:"payment successfull"  })
      const updatepayStatus=await orders.findOneAndUpdate({orderId:order_id},{paymentStatus:"paid",paymentMethod:"online"},{new:true})
   } else {
     const updatepayStatus=await orders.findOneAndUpdate({orderId:order_id},{paymentStatus:"failed"},{new:true})
-    res.status(400).json({ success: false })
+    res.status(400).json({ success: false})
   }
 }

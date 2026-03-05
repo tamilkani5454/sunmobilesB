@@ -1,7 +1,7 @@
 import { Category, SubCategory, Brand } from '../modules/csb.js';
 import Products from '../modules/products.js';
 import { r2 } from '../config/r2Connect.js';
-import { PutObjectCommand } from '@aws-sdk/client-s3';
+import { PutObjectCommand, DeleteObjectCommand} from '@aws-sdk/client-s3';
 import orders from '../modules/orders.js';
 
 
@@ -149,18 +149,30 @@ export const editProducts = async (req, res) => {
             }
         }
     )
+    res.json({success:true, message:"products updated successfully"})
 };
 //delete items controllers
 export const deleteProducts = async (req, res) => {
     const id = req.body.id
-    const delProduct = await Products.findByIdAndDelete({ _id: id })
+    const delProduct = await Products.findById({ _id: id })
+    console.log(delProduct)
+    for (const img of delProduct.images){
+        console.log(img.key)
+        const command = new DeleteObjectCommand({
+            Bucket:process.env.R2_BUCKET_NAME,
+            Key:img.key
+        });
+        await r2.send(command)
+    }
+    await Products.findByIdAndDelete({ _id: id })
+
 }
 // create  orders 
 export const createOrders = async (req, res) => {
     const userId = "6992b349449c6ac69a7f7768"
 
     const products = req.body.cart.map((item, index) => ({
-        productsId: item._id,
+        productId: item._id,
         quantity: Number(item.quantity),
         price: Number(item.offerPrice),
         total: Number(item.offerPrice * item.quantity)
