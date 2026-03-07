@@ -39,7 +39,6 @@ const csb = async (req, res) => {
         res.status(500).json({ message: 'Internal server error' });
     }
 }
-
 //get user orders
 const getUserOrders = async (req, res) => {
     try {
@@ -51,6 +50,9 @@ const getUserOrders = async (req, res) => {
         res.status(500).json({ success: false, message: 'Internal server error' });
     }
 }
-
-export { getProducts, getOrders, csb, getUserOrders };
+const getAllOrders =async(req,res)=>{
+    const orders = await Orders.find({})
+    res.json(orders)
+}
+export { getProducts, getOrders, csb, getUserOrders,getAllOrders };
 

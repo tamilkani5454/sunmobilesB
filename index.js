@@ -7,6 +7,7 @@ import updateRoutes from './src/routeres/updateRoutes.js';
 import { registerRoutes } from './src/routeres/register.js';
 import { paymentRouter } from './src/routeres/paymentRoutes.js';
 import { getUserOrders } from './src/controllers/getItems.js';
+import { authRoutes } from './src/routeres/authRoutes.js';
 
 
 const app = express();
@@ -25,5 +26,5 @@ app.use("/api/update",updateRoutes)
 app.use("/api/register",registerRoutes)
 app.use("/api/payment",paymentRouter)
 app.post("/api/get-user-order",getUserOrders)
-
+app.use("/api/auth",authRoutes)
 app.listen(3000);

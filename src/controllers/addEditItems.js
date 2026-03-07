@@ -1,7 +1,7 @@
 import { Category, SubCategory, Brand } from '../modules/csb.js';
 import Products from '../modules/products.js';
 import { r2 } from '../config/r2Connect.js';
-import { PutObjectCommand, DeleteObjectCommand} from '@aws-sdk/client-s3';
+import { PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
 import orders from '../modules/orders.js';
 
 
@@ -54,7 +54,7 @@ export const addProducts = async (req, res) => {
         })
 
         await newProduct.save();
-        res.status(201).json({ message: 'Product added successfully', product: newProduct });
+        res.status(201).json({ success: true, message: 'Product added successfully', product: newProduct });
 
     } catch (error) {
         console.error('Error adding products:', error);
@@ -69,7 +69,7 @@ export const addCategories = async (req, res) => {
             name: category.name
         })
         await newCategory.save()
-
+        res.json({ success: true, message: "category added successfully" })
     } catch (error) {
         console.error('Error adding category:', error);
         res.status(500).json({ message: 'Internal server error' });
@@ -86,7 +86,7 @@ export const addSubCategories = async (req, res) => {
         })
         await newSubCategory.save()
         res.status(201).json({
-            message: 'Subcategory added successfully', subcategory: newSubCategory
+            success: true, message: 'Subcategory added successfully', subcategory: newSubCategory
         });
     } catch (error) {
         console.error('Error adding subcategory:', error);
@@ -105,7 +105,7 @@ export const addBrands = async (req, res) => {
         })
         await newBrand.save()
         res.status(201).json({
-            message: 'Brand added successfully', brand: newBrand
+            success: true, message: 'Brand added successfully', brand: newBrand
         });
     } catch (error) {
         console.error('Error adding brand:', error);
@@ -113,23 +113,24 @@ export const addBrands = async (req, res) => {
     }
 
 };
-
 //edit items controllers
 export const editCategories = async (req, res) => {
     const data = req.body
 
     await Category.findByIdAndUpdate(data.categoryId, { name: data.name })
+    res.json({ success: true, message: "category updated successfully" })
 
 }
 export const editSubCategories = async (req, res) => {
     const data = req.body
 
     await SubCategory.findByIdAndUpdate(data.subCategoryID, { name: data.name })
-
+    res.json({ success: true, message: "subCategory updated successfully" })
 }
 export const editBrand = async (req, res) => {
     const data = req.body
     const update = await Brand.findByIdAndUpdate(data.brandID, { name: data.name })
+     res.json({success:true, message:"brand updated successfully"})
 }
 export const editProducts = async (req, res) => {
     const data = req.body
@@ -149,22 +150,28 @@ export const editProducts = async (req, res) => {
             }
         }
     )
-    res.json({success:true, message:"products updated successfully"})
+    res.json({ success: true, message: "products updated successfully" })
 };
 //delete items controllers
 export const deleteProducts = async (req, res) => {
     const id = req.body.id
-    const delProduct = await Products.findById({ _id: id })
-    console.log(delProduct)
-    for (const img of delProduct.images){
-        console.log(img.key)
-        const command = new DeleteObjectCommand({
-            Bucket:process.env.R2_BUCKET_NAME,
-            Key:img.key
-        });
-        await r2.send(command)
+    try {
+        const delProduct = await Products.findById({ _id: id })
+        console.log(delProduct)
+        for (const img of delProduct.images) {
+            console.log(img.key)
+            const command = new DeleteObjectCommand({
+                Bucket: process.env.R2_BUCKET_NAME,
+                Key: img.key
+            });
+            await r2.send(command)
+        }
+        await Products.findByIdAndDelete({ _id: id })
+        res.json({ success: true, message: "product deleted succesfully" })
+    } catch (error) {
+        res.json({ error, message: "internal server error" })
     }
-    await Products.findByIdAndDelete({ _id: id })
+
 
 }
 // create  orders 
@@ -183,8 +190,8 @@ export const createOrders = async (req, res) => {
     const deliveryCharge = subTotal < 500 ? 50 : 0
     const finalAmount = subTotal + deliveryCharge
 
-    const orderId ="ORD-" + Date.now() +"-" +Math.random().toString(36).substring(2, 6).toUpperCase()
-        
+    const orderId = "ORD-" + Date.now() + "-" + Math.random().toString(36).substring(2, 6).toUpperCase()
+
 
     const order = new orders({
         userId,
@@ -196,6 +203,6 @@ export const createOrders = async (req, res) => {
 
     })
     await order.save()
-    res.json({ message:"success",order_id:orderId, amount:finalAmount, key: process.env.RAZORPAY_KEY_ID })
+    res.json({ success:true, message: "order created", order_id: orderId, amount: finalAmount, key: process.env.RAZORPAY_KEY_ID })
 
 }

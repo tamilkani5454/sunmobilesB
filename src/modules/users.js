@@ -24,6 +24,11 @@ const userSchema = new mongoose.Schema(
       type: [addressSchema],
       default: []
     },
+    role: {
+      type: String,
+      enum: ["client", "admin"],
+      default: "client",
+    },
   },
   { timestamps: true }
 );
