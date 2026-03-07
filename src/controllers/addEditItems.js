@@ -130,7 +130,7 @@ export const editSubCategories = async (req, res) => {
 export const editBrand = async (req, res) => {
     const data = req.body
     const update = await Brand.findByIdAndUpdate(data.brandID, { name: data.name })
-     res.json({success:true, message:"brand updated successfully"})
+    res.json({ success: true, message: "brand updated successfully" })
 }
 export const editProducts = async (req, res) => {
     const data = req.body
@@ -203,6 +203,17 @@ export const createOrders = async (req, res) => {
 
     })
     await order.save()
-    res.json({ success:true, message: "order created", order_id: orderId, amount: finalAmount, key: process.env.RAZORPAY_KEY_ID })
+    res.json({ success: true, message: "order created", order_id: orderId, amount: finalAmount, key: process.env.RAZORPAY_KEY_ID })
+
+}
+
+export const updateOrderStatus = async (req, res) => {
+    const { id, orderStatus } = req.body
+    try {
+        const order = await orders.findByIdAndUpdate(id, { orderStatus: orderStatus }, { new: true })
+        res.json({ success: true, message: "order status updated successfully" })
+    } catch (error) {
+        res.json({ success: false, message: "internal server error" })
+    }
 
 }
