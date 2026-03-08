@@ -84,5 +84,10 @@ const getusersList = async (req, res) => {
     const usersCount = await users.countDocuments()
     res.json({ success: true, usersCount })
 }
-export { getProducts, getOrders, csb, getUserOrders, getAllOrders, getusersList };
+const getUserData = async (req, res) => {
+    const { userId } = req.body
+    const user = await users.findById(userId).select("-password")
+    res.json(user)
+}
+export { getProducts, getOrders, csb, getUserOrders, getAllOrders, getusersList, getUserData };
 

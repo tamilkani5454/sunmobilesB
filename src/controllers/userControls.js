@@ -80,3 +80,6 @@ export const adminLogin = async (req, res) => {
     }
 
 }
+export const updateAddress = async (req, res) => {
+    
+}

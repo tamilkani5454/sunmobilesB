@@ -3,6 +3,7 @@ import Products from '../modules/products.js';
 import { r2 } from '../config/r2Connect.js';
 import { PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
 import orders from '../modules/orders.js';
+import users from '../modules/users.js';
 
 
 //upload items controller
@@ -216,4 +217,77 @@ export const updateOrderStatus = async (req, res) => {
         res.json({ success: false, message: "internal server error" })
     }
 
+}
+
+export const updateUser = async (req, res) => {
+    try {
+
+        const { userId, editingId, name, phoneNumber, email, street, city, state, pincode } = req.body
+        console.log(req.body)
+        const user = await users.updateOne(
+            { _id: userId, "addresses._id": editingId },
+            {
+                $set: {
+                    "addresses.$.name": name,
+                    "addresses.$.phoneNumber": phoneNumber,
+                    "addresses.$.email": email,
+                    "addresses.$.street": street,
+                    "addresses.$.city": city,
+                    "addresses.$.state": state,
+                    "addresses.$.pincode": pincode
+                }
+            }
+        )
+
+        res.json({
+            success: true,
+            message: "Address Updated",
+            user
+        })
+
+    } catch (error) {
+        res.status(500).json({ message: error.message })
+    }
+}
+
+export const newadress = async (req, res) => {
+    const { userId, name, phoneNumber, email, street, city, state, pincode } = req.body
+    const user = await users.updateOne({ _id: userId }, {
+        $push: {
+            addresses: {
+                name,
+                phoneNumber,
+                email,
+                street,
+                city,
+                state,
+                pincode
+            }
+        }
+    }, { new: true }
+    )
+    console.log(user)
+    res.json({ success: true, message:"address added successfully" })
+
+}
+export const deleteAddress = async (req, res) => {
+    try {
+
+        const { userId, addressId } = req.body
+        console.log(req.body)
+
+        const user = await users.findByIdAndUpdate(userId,
+            {
+                $pull: {
+                    addresses: { _id: addressId }
+                }
+            },
+            { new: true }
+        ).select("-password")
+
+        res.status(200).json({ success: true, message: "Address deleted", })
+
+    } catch (error) {
+        res.status(500).json({ message: error.message })
+    }
 }

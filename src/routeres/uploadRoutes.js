@@ -1,5 +1,5 @@
 import express from 'express';
-import { addProducts, createOrders } from '../controllers/addEditItems.js';
+import { addProducts, createOrders, newadress } from '../controllers/addEditItems.js';
 import { addCategories } from '../controllers/addEditItems.js';
 import { uploadimage } from '../middleWares/multer.js';
 import { addSubCategories } from '../controllers/addEditItems.js';
@@ -13,6 +13,6 @@ uploadRoutes.post('/add-category', addCategories);
 uploadRoutes.post('/add-subcategory', addSubCategories);
 uploadRoutes.post('/add-brand', addBrands);
 uploadRoutes.post('/add-orders',createOrders);
-
+uploadRoutes.post("/add-address",newadress)
 
 export default uploadRoutes;
